@@ -110,7 +110,7 @@
 mod error;
 mod oneio;
 
-pub use error::{OneIoError, OneIoErrorKind};
+pub use error::OneIoError;
 
 pub use crate::oneio::get_cache_reader;
 pub use crate::oneio::get_reader;

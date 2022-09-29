@@ -5,7 +5,7 @@ mod gzip;
 #[cfg(feature = "lz")]
 mod lz4;
 
-use crate::{OneIoError, OneIoErrorKind};
+use crate::OneIoError;
 use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter, Read, Write};
 
@@ -76,18 +76,10 @@ pub fn get_cache_reader(
     force_cache: bool,
 ) -> Result<Box<dyn BufRead>, OneIoError> {
     let dir_path = std::path::Path::new(cache_dir);
-    if !dir_path.is_dir() {
-        match std::fs::create_dir_all(dir_path) {
-            Ok(_) => {}
-            Err(e) => {
-                return Err(OneIoError {
-                    kind: OneIoErrorKind::CacheIoError(format!(
-                        "cache directory creation failed: {}",
-                        e.to_string()
-                    )),
-                })
-            }
-        }
+
+    // There is no harm in calling this if the directory already exists
+    if let Err(e) = std::fs::create_dir_all(dir_path) {
+        return Err(OneIoError::Cache(format!("cache directory creation failed: {}", e)))
     }
 
     let cache_file_path = match cache_file_name {
