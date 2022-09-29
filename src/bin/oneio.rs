@@ -1,7 +1,7 @@
-use std::io::BufRead;
-use std::path::PathBuf;
 use clap::Parser;
+use std::io::BufRead;
 use std::io::Write;
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -31,29 +31,24 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
     let path: &str = cli.file.to_str().unwrap();
-    let reader =
-    match cli.cache_dir {
+    let reader = match cli.cache_dir {
         Some(dir) => {
-
             match oneio::get_cache_reader(path, dir.as_str(), cli.cache_file, cli.cache_force) {
-                Ok(reader) => {reader}
+                Ok(reader) => reader,
                 Err(e) => {
                     eprintln!("cannot open {}: {}", path, e.to_string());
-                    return
+                    return;
                 }
             }
         }
-        None => {
-            match oneio::get_reader(path) {
-                Ok(reader) => {reader}
-                Err(e) => {
-                    eprintln!("cannot open {}: {}", path, e.to_string());
-                    return
-                }
+        None => match oneio::get_reader(path) {
+            Ok(reader) => reader,
+            Err(e) => {
+                eprintln!("cannot open {}: {}", path, e.to_string());
+                return;
             }
-        }
+        },
     };
-
 
     let mut stdout = std::io::stdout();
 
@@ -62,7 +57,7 @@ fn main() {
 
     for line in reader.lines() {
         let line = match line {
-            Ok(l) => {l}
+            Ok(l) => l,
             Err(e) => {
                 eprintln!("cannot read line from {}: {}", path, e.to_string());
                 return;
